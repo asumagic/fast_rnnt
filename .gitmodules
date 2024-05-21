@@ -1,0 +1,3 @@
+[submodule "hipify_torch"]
+	path = hipify_torch
+	url = git@github.com:ROCm/hipify_torch.git
