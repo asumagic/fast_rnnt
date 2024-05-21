@@ -68,7 +68,7 @@ project(fast_rnnt ${languages})
 if(FT_WITH_HIP)
   list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/hipify_torch/cmake")
   include(Hipify)
-  hipify(CUDA_SOURCE_DIR ${PROJECT_SOURCE_DIR} HIP_SOURCE_DIR "${PROJECT_SOURCE_DIR}/hip")
+  hipify(CUDA_SOURCE_DIR ${PROJECT_SOURCE_DIR}/fast_rnnt HIP_SOURCE_DIR "${PROJECT_SOURCE_DIR}/hip")
 endif()
 
 set(FT_VERSION "1.2")
@@ -151,6 +151,24 @@ if(FT_WITH_CUDA)
     set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda -gencode arch=compute_${COMPUTE_ARCH},code=sm_${COMPUTE_ARCH}")
     set(CMAKE_CUDA_ARCHITECTURES "${COMPUTE_ARCH}-real;${COMPUTE_ARCH}-virtual;${CMAKE_CUDA_ARCHITECTURES}")
   endforeach()
+endif()
+
+if(FT_WITH_HIP)
+  add_definitions(-DFT_WITH_HIP)
+
+  find_package(HIP REQUIRED)
+
+  # See comments on the above CUDA code path
+  if(DEFINED CMAKE_HIP_STANDARD)
+    message(WARNING "You've set CMAKE_HIP_STANDARD; please note that this variable is ignored, and CMAKE_CXX_STANDARD"
+      " is used as the C++ standard version for both C++ and HIP.")
+  endif()
+
+
+  unset(CMAKE_HIP_STANDARD CACHE)
+  set(CMAKE_HIP_STANDARD ${CMAKE_CXX_STANDARD})
+
+  set(FT_COMPUTE_ARCHS)
 endif()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
