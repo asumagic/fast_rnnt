@@ -13,7 +13,6 @@ cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
 
 set(CMAKE_DISABLE_FIND_PACKAGE_MKL TRUE)
 set(languages CXX)
-set(_FT_WITH_CUDA ON)
 
 # the following settings are modified from cub/CMakeLists.txt
 set(CMAKE_CXX_STANDARD 14 CACHE STRING "The C++ version to be used.")
@@ -22,34 +21,55 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 message(STATUS "C++ Standard version: ${CMAKE_CXX_STANDARD}")
 
-
 find_program(FT_HAS_NVCC nvcc)
 if(NOT FT_HAS_NVCC AND "$ENV{CUDACXX}" STREQUAL "")
-  message(STATUS "No NVCC detected. Disable CUDA support")
-  set(_FT_WITH_CUDA OFF)
-endif()
-
-if(APPLE OR (DEFINED FT_WITH_CUDA AND NOT FT_WITH_CUDA))
-  if(_FT_WITH_CUDA)
-    message(STATUS "Disable CUDA support")
-    set(_FT_WITH_CUDA OFF)
+  if(DEFINED FT_WITH_CUDA AND FT_WITH_CUDA)
+    message(FATAL_ERROR "No NVCC detected, but CUDA build was explicitly requested by the user")
   endif()
+
+  message(STATUS "No NVCC detected, disabling CUDA support")
+  set(FT_WITH_CUDA OFF)
 endif()
 
-if(_FT_WITH_CUDA)
+if(APPLE)
+  message(STATUS "Apple device detected, disabling CUDA/HIP support")
+  set(FT_WITH_CUDA OFF)
+  set(FT_WITH_HIP OFF)
+endif()
+
+if (NOT DEFINED FT_WITH_CUDA)
+  set(FT_WITH_CUDA ON)
+  message(STATUS "CUDA support:    ON (default, disable with -DFT_WITH_CUDA=OFF if unwanted)")
+else()
+  message(STATUS "CUDA support:    ${FT_WITH_CUDA}")
+endif()
+
+if (NOT DEFINED FT_WITH_HIP)
+  message(STATUS "AMD HIP support: OFF (default, enable with -DFT_WITH_HIP=ON -DFT_WITH_CUDA=OFF if desired)")
+  set(FT_WITH_HIP OFF)
+
+  if (FT_WITH_CUDA)
+    message(FATAL_ERROR "CUDA and HIP are mutually exclusive; if you want AMD support please also pass -DFT_WITH_CUDA=OFF")
+  endif()
+else()
+  message(STATUS "AMD HIP support: ${FT_WITH_HIP}")
+endif()
+
+if(FT_WITH_CUDA)
   set(languages ${languages} CUDA)
-  if(NOT DEFINED FT_WITH_CUDA)
-    set(FT_WITH_CUDA ON)
-  endif()
+elseif(FT_WITH_HIP)
+  set(languages ${languages} HIP)
 endif()
 
 message(STATUS "Enabled languages: ${languages}")
 
 project(fast_rnnt ${languages})
 
-list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/hipify_torch/cmake")
-include(Hipify)
-hipify(CUDA_SOURCE_DIR ${PROJECT_SOURCE_DIR} HIP_SOURCE_DIR "${PROJECT_SOURCE_DIR}/hip")
+if(FT_WITH_HIP)
+  list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/hipify_torch/cmake")
+  include(Hipify)
+  hipify(CUDA_SOURCE_DIR ${PROJECT_SOURCE_DIR} HIP_SOURCE_DIR "${PROJECT_SOURCE_DIR}/hip")
+endif()
 
 set(FT_VERSION "1.2")
 
