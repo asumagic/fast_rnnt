@@ -47,6 +47,10 @@ message(STATUS "Enabled languages: ${languages}")
 
 project(fast_rnnt ${languages})
 
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/hipify_torch/cmake")
+include(Hipify)
+hipify(CUDA_SOURCE_DIR ${PROJECT_SOURCE_DIR} HIP_SOURCE_DIR "${PROJECT_SOURCE_DIR}/hip")
+
 set(FT_VERSION "1.2")
 
 set(ALLOWABLE_BUILD_TYPES Debug Release RelWithDebInfo MinSizeRel)
