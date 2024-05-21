@@ -20,8 +20,8 @@ function(download_pybind11)
 
   include(FetchContent)
 
-  set(pybind11_URL  "https://github.com/pybind/pybind11/archive/v2.6.0.tar.gz")
-  set(pybind11_HASH "SHA256=90b705137b69ee3b5fc655eaca66d0dc9862ea1759226f7ccd3098425ae69571")
+  set(pybind11_URL  "https://github.com/pybind/pybind11/archive/refs/tags/v2.12.0.tar.gz")
+  set(pybind11_HASH "SHA256=bf8f242abd1abcd375d516a7067490fb71abd79519a282d22b6e4d19282185a7")
 
   set(double_quotes "\"")
   set(dollar "\$")
