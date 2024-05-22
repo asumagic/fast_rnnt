@@ -154,6 +154,7 @@ if(FT_WITH_CUDA)
 endif()
 
 if(FT_WITH_HIP)
+  add_definitions(-DFT_WITH_CUDA)
   add_definitions(-DFT_WITH_HIP)
 
   find_package(HIP REQUIRED)
@@ -182,4 +183,9 @@ if(FT_BUILD_TESTS)
   include(googletest)
 endif()
 
-add_subdirectory(fast_rnnt)
+# HACK: need to make it so that only the .cu really gets HIPified, but it's a pain with the current file hierarchy
+if(FT_WITH_HIP)
+  add_subdirectory(hip)
+else()
+  add_subdirectory(fast_rnnt)
+endif()
