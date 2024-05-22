@@ -307,6 +307,7 @@ __global__ void mutual_information_kernel(
         // We don't need to do __syncthreads() in this loop because all the
         // threads that are active are in the same warp.  (However, in future,
         // if NVidia changes some things, we might need to sync here).
+        __syncthreads();
       }
     }
     __syncthreads();
