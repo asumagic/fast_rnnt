@@ -638,6 +638,7 @@ __global__ void mutual_information_backward_kernel(
           //      p_grad[b,s,t+1] * term2(b,s,t)
           p_buf[s][t] = (p_buf[s + 1][t + neg_t_offset] * px_buf[s][t] +
                          p_buf[s][t + 1] * py_buf[s][t]);
+          __syncthreads();
         }
       }
     }
