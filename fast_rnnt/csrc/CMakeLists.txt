@@ -10,7 +10,6 @@ set(srcs
 if (FT_WITH_CUDA)
   list(APPEND srcs mutual_information_cuda.cu)
 elseif(FT_WITH_HIP)
-  transform(OUTPUT_VARIABLE srcs SRCS ${srcs})  # otherwise .cu is ignored
   list(APPEND srcs mutual_information_hip.hip)
 else()
   transform(OUTPUT_VARIABLE srcs SRCS ${srcs})
@@ -22,5 +21,7 @@ target_link_libraries(mutual_information_core PUBLIC ${TORCH_LIBRARIES})
 target_include_directories(mutual_information_core PUBLIC ${PYTHON_INCLUDE_DIRS})
 
 if (FT_WITH_HIP)
+  set_source_files_properties(${srcs} PROPERTIES LANGUAGE HIP)
   set_target_properties(mutual_information_core PROPERTIES LINKER_LANGUAGE HIP)
+  target_link_libraries(mutual_information_core PUBLIC hip::device hip::host)
 endif()

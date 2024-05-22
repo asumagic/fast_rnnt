@@ -8,9 +8,9 @@ set(fast_rnnt_srcs
   mutual_information.cu
 )
 
-# this is not CUDA code so we need the regular C++ compiler in the HIP case
-# thus, also transform if FT_WITH_HIP
-if(NOT FT_WITH_CUDA)
+if(FT_WITH_HIP)
+  set_source_files_properties(${fast_rnnt_srcs} PROPERTIES LANGUAGE HIP)
+elseif(NOT FT_WITH_CUDA)
   transform(OUTPUT_VARIABLE fast_rnnt_srcs SRCS ${fast_rnnt_srcs})
 endif()
 
@@ -31,5 +31,5 @@ elseif(UNIX)
 endif()
 
 if (FT_WITH_HIP)
-  set_target_properties(_fast_rnnt PROPERTIES LINKER_LANGUAGE CXX)
+  set_target_properties(_fast_rnnt PROPERTIES LINKER_LANGUAGE HIP)
 endif()

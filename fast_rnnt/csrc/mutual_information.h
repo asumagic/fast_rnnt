@@ -25,7 +25,7 @@
 #include <vector>
 #include "torch/extension.h"
 
-#ifdef __CUDA_ARCH__
+#if defined(__CUDA_ARCH__) || defined(__HIPCC__)
 #define FT_CUDA_HOSTDEV __host__ __device__
 #else
 #define FT_CUDA_HOSTDEV

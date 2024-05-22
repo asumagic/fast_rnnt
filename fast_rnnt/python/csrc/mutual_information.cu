@@ -18,7 +18,11 @@
  * limitations under the License.
  */
 
+#ifdef __HIP_PLATFORM_AMD__
+#include "fast_rnnt/csrc/device_guard_hip.h"
+#else
 #include "fast_rnnt/csrc/device_guard.h"
+#endif
 #include "fast_rnnt/csrc/mutual_information.h"
 #include "fast_rnnt/python/csrc/mutual_information.h"
 
