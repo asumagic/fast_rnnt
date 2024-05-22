@@ -8,7 +8,9 @@ set(fast_rnnt_srcs
   mutual_information.cu
 )
 
-if(NOT (FT_WITH_CUDA OR FT_WITH_HIP))
+# this is not CUDA code so we need the regular C++ compiler in the HIP case
+# thus, also transform if FT_WITH_HIP
+if(NOT FT_WITH_CUDA)
   transform(OUTPUT_VARIABLE fast_rnnt_srcs SRCS ${fast_rnnt_srcs})
 endif()
 
