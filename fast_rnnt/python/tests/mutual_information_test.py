@@ -288,6 +288,8 @@ class TestMutualInformation(unittest.TestCase):
                     atol = 1.0e-02 if dtype == torch.float32 else 1.0e-04
                     rtol = 1.0e-02 if dtype == torch.float32 else 1.0e-04
 
+                    print(observed_delta, predicted_delta)
+
                     assert torch.allclose(
                         observed_delta, predicted_delta, atol=atol, rtol=rtol
                     )
