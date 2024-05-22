@@ -139,17 +139,17 @@ class TestRnntLoss(unittest.TestCase):
                 import torchaudio.functional
 
                 m = torchaudio.functional.rnnt_loss(
-                    logits=logits,
-                    targets=symbols.int(),
+                    logits=logits.cpu(),
+                    targets=symbols.cpu().int(),
                     logit_lengths=torch.tensor(
-                        [T] * B, dtype=torch.int32, device=device
+                        [T] * B, dtype=torch.int32, device="cpu"
                     ),
                     target_lengths=torch.tensor(
-                        [S] * B, dtype=torch.int32, device=device
+                        [S] * B, dtype=torch.int32, device="cpu"
                     ),
                     blank=termination_symbol,
                     reduction="none",
-                )
+                ).to(device)
                 assert torch.allclose(m, expected.to(device))
 
             # should be invariant to adding a constant for any frame.
@@ -276,10 +276,10 @@ class TestRnntLoss(unittest.TestCase):
                     import torchaudio.functional
 
                     m = torchaudio.functional.rnnt_loss(
-                        logits=logits,
-                        targets=symbols.int(),
-                        logit_lengths=boundary[:, 3].int(),
-                        target_lengths=boundary[:, 2].int(),
+                        logits=logits.cpu(),
+                        targets=symbols.cpu().int(),
+                        logit_lengths=boundary[:, 3].cpu().int(),
+                        target_lengths=boundary[:, 2].cpu().int(),
                         blank=termination_symbol,
                     )
                     assert torch.allclose(m, expected.to(device))
@@ -364,10 +364,10 @@ class TestRnntLoss(unittest.TestCase):
                 logits2 = logits.detach().clone().float()
                 logits2.requires_grad_()
                 torch_loss = torchaudio.functional.rnnt_loss(
-                    logits=logits2,
-                    targets=symbols.int(),
-                    logit_lengths=boundary[:, 3].int(),
-                    target_lengths=boundary[:, 2].int(),
+                    logits=logits2.cpu(),
+                    targets=symbols.cpu().int(),
+                    logit_lengths=boundary[:, 3].cpu().int(),
+                    target_lengths=boundary[:, 2].cpu().int(),
                     blank=termination_symbol,
                 )
                 torch_grad = torch.autograd.grad(torch_loss, logits2)
