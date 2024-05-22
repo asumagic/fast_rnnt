@@ -266,7 +266,11 @@ __global__ void mutual_information_kernel(
 
     int s = threadIdx.x;
     for (int i = 1; i < block_S + block_T - 1; ++i) {
-      __syncwarp();
+      // HACK: this was changed from __syncwarp() because HIP lacks support for
+      // it. this is marked as a hack, because I am not fully sure what the
+      // consequences of this is, although it seems like it should be syncing
+      // the threads and act as a memory barrier anyway.
+      __syncthreads();
       // i is the inner iteration, which corresponds to the (s + t) indexes of
       // the elements within the block that we write.  So i == 0 writes
       // positions (s, t) == (0, 0) (but we treated i == 0 as a special case
@@ -617,7 +621,11 @@ __global__ void mutual_information_backward_kernel(
     {
       int s = threadIdx.x;
       for (int i = first_iter; i >= 0; --i) {
-        __syncwarp();
+        // HACK: this was changed from __syncwarp() because HIP lacks support for
+        // it. this is marked as a hack, because I am not fully sure what the
+        // consequences of this is, although it seems like it should be syncing
+        // the threads and act as a memory barrier anyway.
+        __syncthreads();
         int t = i - s;
         if (s < block_S &&
             static_cast<unsigned int>(t) < static_cast<unsigned int>(block_T)) {
