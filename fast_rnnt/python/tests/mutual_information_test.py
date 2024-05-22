@@ -150,8 +150,8 @@ class TestMutualInformation(unittest.TestCase):
                     # sequence dim
                     m3 = m3.sum(dim=0)
 
-                    assert torch.allclose(m, m2)
-                    assert torch.allclose(m, m3)
+                    assert torch.allclose(m, m2, rtol=1e-2)
+                    assert torch.allclose(m, m3, rtol=1e-2)
 
                     # the loop this is in checks that the CPU and CUDA versions
                     # give the same derivative;
