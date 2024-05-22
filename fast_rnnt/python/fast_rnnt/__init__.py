@@ -1,3 +1,7 @@
+# required to avoid order initialization issues with AMD HIP
+# (some assertion failure in rocclr)
+import torch
+
 from _fast_rnnt import with_cuda
 
 from .mutual_information import mutual_information_recursion
