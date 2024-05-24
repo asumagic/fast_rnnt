@@ -147,18 +147,18 @@ class TestMutualInformation(unittest.TestCase):
 
                     if device != torch.device("cpu"):
                         assert torch.allclose(
-                            m.cpu(), fast_rnnt.mutual_information_recursion(px.cpu(), py.cpu(), boundary.cpu())
+                            m.cpu(), fast_rnnt.mutual_information_recursion(px.cpu(), py.cpu(), (boundary.cpu() if boundary is not None else None))
                         )
 
                         assert torch.allclose(
                             m2.cpu(), fast_rnnt.joint_mutual_information_recursion(
-                                (px.cpu(),), (py.cpu(),), boundary.cpu()
+                                (px.cpu(),), (py.cpu(),), (boundary.cpu() if boundary is not None else None)
                             )
                         )
 
                         assert torch.allclose(
                             m3.cpu(), fast_rnnt.joint_mutual_information_recursion(
-                                (px.cpu() * 0.5, px.cpu() * 0.5), (py.cpu() * 0.5, py.cpu() * 0.5), boundary.cpu()
+                                (px.cpu() * 0.5, px.cpu() * 0.5), (py.cpu() * 0.5, py.cpu() * 0.5), (boundary.cpu() if boundary is not None else None)
                             )
                         )
 
