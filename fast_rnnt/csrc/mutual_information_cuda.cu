@@ -305,7 +305,6 @@ __global__ void mutual_information_kernel(
         // We don't need to do __syncthreads() in this loop because all the
         // threads that are active are in the same warp.  (However, in future,
         // if NVidia changes some things, we might need to sync here).
-        __syncthreads();
       }
     }
     __syncthreads();
@@ -634,7 +633,6 @@ __global__ void mutual_information_backward_kernel(
           //      p_grad[b,s,t+1] * term2(b,s,t)
           p_buf[s][t] = (p_buf[s + 1][t + neg_t_offset] * px_buf[s][t] +
                          p_buf[s][t + 1] * py_buf[s][t]);
-          __syncthreads();
         }
       }
     }
