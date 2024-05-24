@@ -266,10 +266,8 @@ __global__ void mutual_information_kernel(
 
     int s = threadIdx.x;
     for (int i = 1; i < block_S + block_T - 1; ++i) {
-      // HACK: this was changed from __syncwarp() because HIP lacks support for
-      // it. this is marked as a hack, because I am not fully sure what the
-      // consequences of this is, although it seems like it should be syncing
-      // the threads and act as a memory barrier anyway.
+      // ROCm devices (currently) do not support independent thread scheduling,
+      // thus no __syncwarp()
       __syncthreads();
       // i is the inner iteration, which corresponds to the (s + t) indexes of
       // the elements within the block that we write.  So i == 0 writes
@@ -346,11 +344,11 @@ __global__ void mutual_information_kernel(
 // out-of-range gradients are zero, if we multiply them by infinity
 // we get NaN.
 template <typename Real> __forceinline__ __device__ Real safe_exp(Real x) {
-  if (x - x != 0)
+  if (!isfinite(x))
     return 0;
   else {
     Real ans = exp(x);
-    if (ans - ans != 0.0)
+    if (!isfinite(ans))
       return 0;
     return ans;
   }
@@ -622,10 +620,8 @@ __global__ void mutual_information_backward_kernel(
     {
       int s = threadIdx.x;
       for (int i = first_iter; i >= 0; --i) {
-        // HACK: this was changed from __syncwarp() because HIP lacks support for
-        // it. this is marked as a hack, because I am not fully sure what the
-        // consequences of this is, although it seems like it should be syncing
-        // the threads and act as a memory barrier anyway.
+        // ROCm devices (currently) do not support independent thread scheduling,
+        // thus no __syncwarp()
         __syncthreads();
         int t = i - s;
         if (s < block_S &&
